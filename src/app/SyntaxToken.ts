@@ -7,6 +7,8 @@ export enum SyntaxKind {
   subtractToken = 'subtractToken',
   divideToken = 'divideToken',
   equalToken = 'equalToken',
+  endOfLineToken = "endOfLineToken",
+  badToken = "badToken"
 }
 export class SyntaxToken {
   kind: SyntaxKind;
