@@ -1,7 +1,7 @@
 {
-  "name": "typescript-boilerplate",
+  "name": "my-custom-compiler",
   "version": "0.0.0",
-  "description": "Minimalistic boilerplate to quick-start Node.js development in TypeScript.",
+  "description": "Build a language parser from scratch using Javascript",
   "type": "module",
   "engines": {
     "node": ">= 18.12 <19"
@@ -33,7 +33,7 @@
     "prettier": "prettier --config .prettierrc --write .",
     "test:watch": "jest --watch"
   },
-  "author": "Jakub Synowiec <jsynowiec@users.noreply.github.com>",
+  "author": "Marc Flavius",
   "license": "Apache-2.0",
   "dependencies": {
     "lodash-contrib": "^4.1200.1",
