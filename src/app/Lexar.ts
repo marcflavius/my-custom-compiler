@@ -20,23 +20,33 @@ export class Lexar implements LexarInt {
     return this._text[this._position];
   }
 
+  public isNumeric(value: any) {
+    return _.isNumeric(value);
+  }
+  public isWhiteSpace(value: any) {
+    return value == ' ';
+  }
+
   public nextToken(): SyntaxToken {
     // <number>
     // <operator>
     // <whitespace>
-    if (_.isNumeric(this.current)) {
-      return this.captureNumericGroupe();
+    if (this.isNumeric(this.current)) {
+      return this.captureGroupe(this.isNumeric, SyntaxKind.numberToken);
+    }
+    if (this.isWhiteSpace(this.current)) {
+      return this.captureGroupe(this.isWhiteSpace, SyntaxKind.whiteSpaceToken);
     }
     return undefined;
   }
 
-  private captureNumericGroupe() {
-    const tokenStart = this._position;
-    while (_.isNumeric(this.current)) {
+  private captureGroupe(onCondition: Function, syntaxKind: SyntaxKind) {
+    const start = this._position;
+    while (onCondition(this.current)) {
       this._position++;
     }
-    const tokenLength = this._position - tokenStart;
-    const extract = this._text.substring(tokenStart, tokenLength);
-    return new SyntaxToken(SyntaxKind.numberToken, tokenStart, extract);
+    const end = this._position;
+    const extract = this._text.slice(start, end);
+    return new SyntaxToken(syntaxKind, start, extract);
   }
 }

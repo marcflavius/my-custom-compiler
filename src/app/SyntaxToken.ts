@@ -1,6 +1,7 @@
 export enum SyntaxKind {
   numberToken = 'numberToken',
   stringToken = 'stringToken',
+  whiteSpaceToken = 'whiteSpaceToken',
 }
 export class SyntaxToken {
   kind: SyntaxKind;

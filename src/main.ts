@@ -11,7 +11,7 @@ function main() {
   while (true) {
     console.log('> ');
     const line = prompt('');
-    if (_.isEmpty(line.trim())) {
+    if (_.isEmpty(line)) {
       return;
     }
     const lexar = new Lexar(line);
