@@ -1,5 +1,37 @@
 {
+    // cSpell
     "cSpell.words": [
         "Lexar"
-    ]
+    ],
+    // editor
+    "editor.codeActionsOnSave": {
+      "eslint.autoFixOnSave": true,
+      "source.addMissingImports": true,
+      "source.fixAll.eslint": true
+    },
+    // gitlens
+    "gitlens.codeLens.recentChange.enabled": false,
+    "gitlens.codeLens.authors.enabled": false,
+    // eslint
+    "eslint.format.enable": true,
+    "eslint.validate": [
+      "javascript",
+      "typescriptreact"
+    ],
+    "eslint.options": {
+      "overrideConfig": {
+        "rules": {
+          // "quotes": [
+          //        "single"
+          // ],
+        },
+      },
+    },
+    "eslint.rules.customizations": [],
+    // prettier
+    "prettier.enable": true,
+    "prettier.useTabs": false,
+    "prettier.printWidth": 100,
+    "prettier.tabWidth": 4,
+    "prettier.singleQuote": true,
 }
