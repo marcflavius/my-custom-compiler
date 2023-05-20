@@ -2,6 +2,7 @@
 import _ from 'lodash-contrib';
 import { chars } from './constants/chars.js';
 import { SyntaxKind, SyntaxToken } from './SyntaxToken.js';
+
 enum MathOperator {
   multiply = '*',
   addition = '+',
@@ -11,13 +12,45 @@ enum MathOperator {
 
 type MakeIsOperator = (operator: MathOperator) => boolean;
 type OnCondition = (value: string) => boolean;
+type CaptureGroupeOptions = {
+  maxTokenLength: number
+}
+
 interface LexarContract {
   nextToken(): void;
 }
+
 export class Lexar implements LexarContract {
+  /**
+   * The given text in process
+   *
+   * @private
+   * @type {string}
+   * @memberof Lexar
+   */
   private readonly _text: string;
+
+  /**
+   * Track the lexar pointer position
+   *
+   * @private
+   * @type {number}
+   * @memberof Lexar
+   */
   private _position: number;
-  public words: any[];
+
+  /**
+   * A map between math operator and lexar syntaxKind
+   *
+   * @private
+   * @type {{
+   *     '*': SyntaxKind;
+   *     '+': SyntaxKind;
+   *     '-': SyntaxKind;
+   *     '/': SyntaxKind;
+   *   }}
+   * @memberof Lexar
+   */
   private _operatorTokenMap: {
     '*': SyntaxKind;
     '+': SyntaxKind;
@@ -35,6 +68,14 @@ export class Lexar implements LexarContract {
       [MathOperator.divide]: SyntaxKind.divideToken,
     };
   }
+
+  /**
+   * The current token
+   *
+   * @readonly
+   * @private
+   * @memberof Lexar
+   */
   private get _current(): string {
     if (this._position >= this._text.length) {
       return chars.endOfLine;
@@ -42,25 +83,78 @@ export class Lexar implements LexarContract {
     return this._text[this._position];
   }
 
+  /**
+   * Is Numeric check
+   *
+   */
   private _isNumeric(value: string): boolean {
     return _.isNumeric(value);
   }
+
+  /**
+   * Is Whitespace check
+   *
+   * @private
+   * @param {string} value
+   * @return {*}  {boolean}
+   * @memberof Lexar
+   */
   private _isWhiteSpace(value: string): boolean {
     return value == ' ';
   }
+
+  /**
+   * Is Operator check
+   *
+   * @private
+   * @param {string} value
+   * @return {*}  {boolean}
+   * @memberof Lexar
+   */
   private _isOperator(value: string): boolean {
     return Object.keys(this._operatorTokenMap).includes(value);
   }
+
+  /**
+   * Make IsOperator
+   *
+   * @private
+   * @param {MathOperator} operator
+   * @return {*}  {MakeIsOperator}
+   * @memberof Lexar
+   */
   private _makeIsOperator(operator: MathOperator): MakeIsOperator {
     return (value: string): boolean => value === operator;
   }
+
+  /**
+   * Make SyntaxKind
+   *
+   * @private
+   * @param {MathOperator} operator
+   * @return {*}  {SyntaxKind}
+   * @memberof Lexar
+   */
   private _makeSyntaxKind(operator: MathOperator): SyntaxKind {
     return SyntaxKind[this._operatorTokenMap[operator]];
   }
+
+  /**
+   * Capture the current token
+   *
+   * @private
+   * @param {OnCondition} onCondition
+   * @param {SyntaxKind} syntaxKind
+   * @param {*} [options={
+   *       maxTokenLength: -1,
+   *     }]
+   * @return {*}  {SyntaxToken}
+   * @memberof Lexar
+   */
   private _captureGroupe(
     onCondition: OnCondition,
     syntaxKind: SyntaxKind,
-    options = {
+    options: CaptureGroupeOptions = {
       maxTokenLength: -1,
     },
   ): SyntaxToken {
@@ -78,6 +172,13 @@ export class Lexar implements LexarContract {
     const extract = this._text.slice(start, end);
     return new SyntaxToken(syntaxKind, start, extract);
   }
+
+  /**
+   * Increment the lexar pointer and return the current token
+   *
+   * @return {SyntaxToken}  {SyntaxToken}
+   * @memberof Lexar
+   */
   public nextToken(): SyntaxToken {
     if (this._isNumeric(this._current)) {
       return this._captureGroupe(this._isNumeric, SyntaxKind.numberToken);
@@ -96,4 +197,5 @@ export class Lexar implements LexarContract {
     }
     return new SyntaxToken(SyntaxKind.badToken, this._position, this._current);
   }
+
 }
