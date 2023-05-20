@@ -12,9 +12,6 @@ enum MathOperator {
 
 type MakeIsOperator = (operator: MathOperator) => boolean;
 type OnCondition = (value: string) => boolean;
-type CaptureGroupeOptions = {
-  maxTokenLength: number
-}
 
 interface LexarContract {
   nextToken(): void;
@@ -31,7 +28,8 @@ export class Lexar implements LexarContract {
   private readonly _text: string;
 
   /**
-   * Track the lexar pointer position
+   * Track the lexar pointer position.
+   * Zero base index
    *
    * @private
    * @type {number}
@@ -104,6 +102,17 @@ export class Lexar implements LexarContract {
   }
 
   /**
+   * Check if lexar pointer on text last character
+   *
+   * @private
+   * @return {*}  {boolean}
+   * @memberof Lexar
+   */
+  private _isEndOfLine(): boolean {
+    return this._position + 1 === this._text.length;
+  }
+
+  /**
    * Is Operator check
    *
    * @private
@@ -143,7 +152,7 @@ export class Lexar implements LexarContract {
    * Capture the current token
    *
    * @private
-   * @param {OnCondition} onCondition
+   * @param {OnCondition} greedinessCallback
    * @param {SyntaxKind} syntaxKind
    * @param {*} [options={
    *       maxTokenLength: -1,
@@ -152,22 +161,15 @@ export class Lexar implements LexarContract {
    * @memberof Lexar
    */
   private _captureGroupe(
-    onCondition: OnCondition,
+    greedinessCallback: OnCondition,
     syntaxKind: SyntaxKind,
-    options: CaptureGroupeOptions = {
-      maxTokenLength: -1,
-    },
   ): SyntaxToken {
     const start = this._position;
-    if (options.maxTokenLength === this._position) {
+
+    do {
       this._position++;
-      const end = this._position;
-      const extract = this._text.slice(start, end);
-      return new SyntaxToken(syntaxKind, start, extract);
-    }
-    while (onCondition(this._current)) {
-      this._position++;
-    }
+    } while (greedinessCallback(this._current));
+
     const end = this._position;
     const extract = this._text.slice(start, end);
     return new SyntaxToken(syntaxKind, start, extract);
@@ -195,7 +197,17 @@ export class Lexar implements LexarContract {
         this._makeSyntaxKind(this._current as MathOperator),
       );
     }
-    return new SyntaxToken(SyntaxKind.badToken, this._position, this._current);
+    if (!this._isEndOfLine()) {
+      return this._captureGroupe(this._firstChar, SyntaxKind.badToken);
+    }
+    return new SyntaxToken(
+      SyntaxKind.endOfLineToken,
+      this._position,
+      this._current,
+    );
   }
 
+  private _firstChar(): boolean {
+    return false;
+  }
 }
