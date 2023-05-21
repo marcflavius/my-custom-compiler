@@ -1,14 +1,9 @@
+/* eslint-disable no-constant-condition */
 /*eslint space-before-blocks: "error"*/
 import _ from 'lodash-contrib';
 import { chars } from './constants/chars.js';
 import { SyntaxKind, SyntaxToken } from './SyntaxToken.js';
-
-enum MathOperator {
-  multiply = '*',
-  addition = '+',
-  subtract = '-',
-  divide = '/',
-}
+import { MathOperator } from './Utils.js';
 
 type MakeIsOperator = (operator: MathOperator) => boolean;
 type OnCondition = (value: string) => boolean;
@@ -209,5 +204,27 @@ export class Lexar implements LexarContract {
 
   private _firstChar(): boolean {
     return false;
+  }
+
+  getList(): SyntaxToken[] {
+    const list: SyntaxToken[] = [];
+    let current: SyntaxToken;
+    while (true) {
+      current = this.nextToken();
+      if (this.isValidNode(current)) {
+        list.push(current);
+      }
+      if (current.kind === SyntaxKind.endOfLineToken) {
+        return list;
+      }
+    }
+  }
+
+  private isValidNode(current: SyntaxToken): boolean {
+    return (
+      current.kind !== SyntaxKind.badToken &&
+      current.kind !== SyntaxKind.whiteSpaceToken &&
+      current.kind !== SyntaxKind.endOfLineToken
+    );
   }
 }

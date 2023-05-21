@@ -1,3 +1,6 @@
+import { SyntaxNode } from "./SyntaxNode.js";
+
+
 export enum SyntaxKind {
   numberToken = 'numberToken',
   stringToken = 'stringToken',
@@ -8,12 +11,13 @@ export enum SyntaxKind {
   divideToken = 'divideToken',
   equalToken = 'equalToken',
   endOfLineToken = "endOfLineToken",
-  badToken = "badToken"
+  badToken = "badToken",
+  endOfExpression = "endOfExpression"
 }
-export class SyntaxToken {
-  kind: SyntaxKind;
-  position: number;
-  text: string;
+export class SyntaxToken implements SyntaxNode {
+  public kind: SyntaxKind;
+  public position: number;
+  public text: string;
   constructor(kind: SyntaxKind, position: number, text: string) {
     this.kind = kind;
     this.position = position;
